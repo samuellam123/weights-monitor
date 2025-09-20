@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime
 from st_supabase_connection import SupabaseConnection
 from postgrest.exceptions import APIError
+import altair as alt
 
 # Initialize connection.
 conn = st.connection("supabase", type=SupabaseConnection)
@@ -102,7 +103,8 @@ df = df_w.merge(
 df["datetime"] = pd.to_datetime(df["datetime"], format="mixed", utc=True).dt.tz_convert(
     "Asia/Singapore"
 )
-df = df.sort_values("datetime")
+df["weight"] = pd.to_numeric(df["weight"], errors="coerce")  # ensure numeric
+df = df.dropna(subset=["datetime", "weight"]).sort_values("datetime")
 
 # pivot to wide for line_chart
 wide = df.pivot_table(
@@ -121,5 +123,26 @@ wide_daily = (
     .ffill()  # (optional) fill trailing NaN
 )
 
+# 4) Altair chart with fixed y-axis range 40–110 kg
 st.subheader("Weight vs Date (interpolated)")
-st.line_chart(wide_daily)
+chart_df = wide_daily.reset_index().melt(
+    "datetime", var_name="name", value_name="weight"
+)
+
+chart = (
+    alt.Chart(chart_df)
+    .mark_line(point=True)
+    .encode(
+        x=alt.X("datetime:T", title="Date"),
+        y=alt.Y("weight:Q", title="Weight (kg)", scale=alt.Scale(domain=[45, 110])),
+        color=alt.Color("name:N", title="Person"),
+        tooltip=[
+            "name",
+            alt.Tooltip("datetime:T", title="Date"),
+            alt.Tooltip("weight:Q", title="Weight"),
+        ],
+    )
+    .interactive()
+)
+
+st.altair_chart(chart, use_container_width=True)
