@@ -46,7 +46,7 @@ def insert_weight(user_id: int, weight_kg: float, date: datetime.date = None):
     print(f"Insert success: {user_id}, {weight_kg}")
 
 
-namelist = ["Samuel", "Fabian", "Genee"]
+namelist = ["Samuel", "Fabian", "Genee", "Chong Hau", "Zoe"]
 
 with st.form("my_form"):
 
@@ -72,7 +72,7 @@ with st.form("my_form"):
     submitted = st.form_submit_button("Submit form")
 
     if submitted:
-        name_to_id = {"Samuel": 1, "Fabian": 2, "Genee": 3}
+        name_to_id = {"Samuel": 1, "Fabian": 2, "Genee": 3, "Chong Hau": 4, "Zoe": 5}
 
         try:
             insert_weight(name_to_id.get(name, 1), float(weight_input), date_input)
