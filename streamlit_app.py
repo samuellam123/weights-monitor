@@ -55,7 +55,7 @@ with st.form("my_form"):
         namelist,
     )
 
-    weight_input_desc = f"Enter weight now ({datetime.now().date()}, {datetime.now().time().strftime("%H:%M")})"
+    weight_input_desc = f"Enter weight now ({datetime.now().date()})"
 
     weight_input = st.number_input(
         weight_input_desc,
